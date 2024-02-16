@@ -1,0 +1,24 @@
+{
+  "template": "https://github.com/monarch-initiative/monarch-project-template.git",
+  "commit": "9d4f915d4a4cd1a9d8206506db1e261bc397de9c",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "uniprot2s3",
+      "github_org_name": "bsantan",
+      "__project_slug": "uniprot2s3",
+      "project_description": "Uniprot download to s3.",
+      "min_python_version": "3.9",
+      "file_name": "main",
+      "greeting_recipient": "World",
+      "full_name": "Brook Santangelo",
+      "email": "brook.santangelo@cuanschutz.edu",
+      "__author": "Brook Santangelo <brook.santangelo@cuanschutz.edu>",
+      "license": "MIT",
+      "github_token_for_doc_deployment": "GH_TOKEN",
+      "github_token_for_pypi_deployment": "PYPI_TOKEN",
+      "_template": "https://github.com/monarch-initiative/monarch-project-template.git"
+    }
+  },
+  "directory": null
+}
