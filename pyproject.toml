@@ -11,6 +11,9 @@ python = "^3.9"
 click = "*"
 importlib-metadata = ">=4.8.0"
 poetry-dynamic-versioning = "^1.2.0"
+requests = "^2.31.0"
+requests-cache = "^1.1.1"
+tqdm = "^4.66.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = {version = ">=7.1.2"}

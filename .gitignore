@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .vscode/*
+data/raw/ncbitaxon_removed_subset.json
+uniprot_cache.sqlite
+data/raw/s3/*

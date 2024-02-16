@@ -5,7 +5,9 @@ import logging
 import click
 
 from uniprot2s3 import __version__
-from uniprot2s3.main import demo
+from uniprot2s3.main import run_api
+
+show_status_option = click.option("--show-status/--no-show-status", default=True)
 
 __all__ = [
     "main",
@@ -36,9 +38,15 @@ def main(verbose: int, quiet: bool):
 
 
 @main.command()
-def run():
-    """Run the uniprot2s3's demo command."""
-    demo()
+@show_status_option
+def run(show_status):
+    """
+    Get data via rest API.
+
+    :param show_status: Flag to show download status or not.
+    :return: None
+    """
+    run_api(show_status)
 
 
 if __name__ == "__main__":
