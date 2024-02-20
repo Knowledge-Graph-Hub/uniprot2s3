@@ -14,6 +14,7 @@ from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from .constants import (
+    KGMICROBE_PROTEOMES_FILENAME,
     NCBITAXON_PREFIX,
     ORGANISM_ID_MIXED_CASE,
     PROTEOMES_FILENAME,
@@ -276,6 +277,13 @@ def run_uniprot_api_parallel(taxa_id_from_proteomes_set, show_status: bool, work
     organism_list = get_organism_list()
 
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_set))
+
+    # Write used IDs to file
+    file_path = Path(UNIPROT_S3_DIR) / f"{KGMICROBE_PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
+    with open(file_path, "w") as f:
+        for line in taxa_id_common_with_proteomes_list:
+            f.write(f"{line}\n")
+
     #!For testing
     # taxa_id_common_with_proteomes_list = taxa_id_common_with_proteomes_list[0:5]
 
