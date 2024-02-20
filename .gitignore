@@ -131,7 +131,5 @@ dmypy.json
 data/raw/ncbitaxon_removed_subset.json
 uniprot_cache.sqlite
 data/raw/s3/*
-.DS_Store
-data/.DS_Store
-data/raw/.DS_Store
-.gitignore
+!data/raw/s3/Proteomes_KGMicrobe_Subset.tsv
+*.DS_Store
