@@ -12,8 +12,6 @@ pipeline {
         BUILDSTARTDATE = sh(script: "echo `date +%Y%m%d`", returnStdout: true).trim()
         S3PROJECTDIR = '' // no trailing slash
 
-	RESNIK_THRESHOLD = '4.0' // value for min-ancestor-information-content parameter
-
         // Distribution ID for the AWS CloudFront for this bucket
         // used solely for invalidations
         AWS_CLOUDFRONT_DISTRIBUTION_ID = 'EUVSWXZQBXCFP'
@@ -63,7 +61,7 @@ pipeline {
             }
         }
 
-        stage('Run similarity ') {
+        stage('Run downloader') {
             steps {
                 dir('./working') {
                     sh '. venv/bin/activate && rm data/raw/uniprot_empty_organism.tsv'
@@ -74,7 +72,7 @@ pipeline {
 
         // Harry to help here
         stage('Upload result') {
-            // Store similarity results at s3://kg-hub-public-data/monarch/
+            // Store similarity results at s3://kg-hub-public-data/frozen_incoming_data/uniprot
             steps {
                 dir('./working') {
                     script {
@@ -86,10 +84,11 @@ pipeline {
 
 
                                 // upload to remote
-				sh 'tar -czvf HP_vs_MP_semsimian.tsv.tar.gz HP_vs_MP_semsimian.tsv'
-                                sh '. venv/bin/activate && s3cmd -c $S3CMD_CFG put -pr --acl-public --cf-invalidate HP_vs_MP_semsimian.tsv.tar.gz s3://kg-hub-public-data/monarch/'
+				// TODO: update this to compress all directories, as there will be many files
+				sh 'tar -czvf uniprot.tar.gz ./data/uniprot'
+                                sh '. venv/bin/activate && s3cmd -c $S3CMD_CFG put -pr --acl-public --cf-invalidate uniprot.tar.gz s3://kg-hub-public-data/frozen_incoming_data/uniprot'
                                 // Should now appear at:
-                                // https://kg-hub.berkeleybop.io/monarch/
+                                // https://kg-hub.berkeleybop.io/frozen_incoming_data/uniprot
                             }
 
                         }
