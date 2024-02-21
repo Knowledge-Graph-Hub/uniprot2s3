@@ -116,7 +116,7 @@ def run_proteome_api(show_status: bool) -> set:
     requests_cache.install_cache("uniprot_cache")
 
     # Ensure the directory for storing Uniprot files exists
-    Path(UNIPROT_S3_DIR).mkdir(parents=True, exist_ok=True)
+    Path(RAW_DATA_DIR).mkdir(parents=True, exist_ok=True)
 
     organism_ids_set = fetch_uniprot_reference_proteome_data()
 
@@ -182,7 +182,7 @@ def fetch_uniprot_data(organism_id):
 
 def fetch_uniprot_reference_proteome_data() -> set:
     """Single URL request for Uniprot proteome data."""
-    file_path = Path(UNIPROT_S3_DIR) / f"{PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
+    file_path = Path(RAW_DATA_DIR) / f"{PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
     all_proteomes_query = "%28*%29"
 
     url = construct_query_url(
@@ -236,9 +236,6 @@ def run_uniprot_api(taxa_id_from_proteomes_set, show_status: bool) -> None:
     # Cache HTTP requests to avoid repeated calls
     requests_cache.install_cache("uniprot_cache")
 
-    # Ensure the directory for storing Uniprot files exists
-    # Path(UNIPROT_S3_DIR).mkdir(parents=True, exist_ok=True)
-
     organism_list = get_organism_list()
 
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_set))
@@ -271,15 +268,12 @@ def run_uniprot_api_parallel(taxa_id_from_proteomes_set, show_status: bool, work
     # Cache HTTP requests to avoid repeated calls
     requests_cache.install_cache("uniprot_cache")
 
-    # Ensure the directory for storing Uniprot files exists
-    # Path(UNIPROT_S3_DIR).mkdir(parents=True, exist_ok=True)
-
     organism_list = get_organism_list()
 
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_set))
 
     # Write used IDs to file
-    file_path = Path(UNIPROT_S3_DIR) / f"{KGMICROBE_PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
+    file_path = Path(RAW_DATA_DIR) / f"{KGMICROBE_PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
     with open(file_path, "w") as f:
         for line in taxa_id_common_with_proteomes_list:
             f.write(f"{line}\n")
