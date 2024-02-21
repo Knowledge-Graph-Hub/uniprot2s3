@@ -7,8 +7,8 @@ from functools import partial
 from pathlib import Path
 from typing import List
 from urllib import parse
-import pandas as pd
 
+import pandas as pd
 import requests
 import requests_cache
 from tqdm import tqdm
@@ -19,6 +19,8 @@ from .constants import (
     NCBITAXON_PREFIX,
     ORGANISM_ID_MIXED_CASE,
     PROTEOMES_FILENAME,
+    PROTEOMES_ORGANISM_ID_COLUMNNAME,
+    PROTEOMES_PROTEOME_ID_COLUMNNAME,
     RAW_DATA_DIR,
     TAXONOMY_ID_UNIPROT_PREFIX,
     UNIPROT_BASE_URL,
@@ -28,8 +30,6 @@ from .constants import (
     UNIPROT_REFERENCE_PROTEOMES_FIELDS,
     UNIPROT_REFERENCE_PROTEOMES_URL,
     UNIPROT_SIZE,
-    PROTEOMES_PROTEOME_ID_COLUMNNAME,
-    PROTEOMES_ORGANISM_ID_COLUMNNAME
 )
 from .dummy_tqdm import DummyTqdm
 
@@ -205,9 +205,11 @@ def fetch_uniprot_reference_proteome_data() -> list:
                     file.write(response.text)
 
         # Read file to df for sorting
-        df = pd.read_csv(file_path,sep='\t',low_memory=False)
-        df = df.sort_values(by=[PROTEOMES_ORGANISM_ID_COLUMNNAME,PROTEOMES_PROTEOME_ID_COLUMNNAME], axis=0, ascending=True)
-        df.to_csv(file_path,sep='\t',index=False)
+        df = pd.read_csv(file_path, sep="\t", low_memory=False)
+        df = df.sort_values(
+            by=[PROTEOMES_ORGANISM_ID_COLUMNNAME, PROTEOMES_PROTEOME_ID_COLUMNNAME], axis=0, ascending=True
+        )
+        df.to_csv(file_path, sep="\t", index=False)
 
         organism_ids = df[PROTEOMES_ORGANISM_ID_COLUMNNAME].unique().tolist()
 
@@ -266,7 +268,7 @@ def run_uniprot_api_parallel(taxa_id_from_proteomes_list, show_status: bool, wor
 
     organism_list = get_organism_list()
 
-    # Sort list 
+    # Sort list
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
     taxa_id_common_with_proteomes_list.sort()
 
