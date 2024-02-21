@@ -84,9 +84,8 @@ pipeline {
 
 
                                 // upload to remote
-				// TODO: update this to compress all directories, as there will be many files
-				sh 'tar -czvf uniprot.tar.gz ./data/uniprot'
-                                sh '. venv/bin/activate && s3cmd -c $S3CMD_CFG put -pr --acl-public --cf-invalidate uniprot.tar.gz s3://kg-hub-public-data/frozen_incoming_data/uniprot'
+				sh 'tar -czvf uniprot_proteomes.tar.gz ./data/raw/s3'
+                                sh '. venv/bin/activate && s3cmd -c $S3CMD_CFG put -pr --acl-public --cf-invalidate uniprot_proteomes.tar.gz s3://kg-hub-public-data/frozen_incoming_data/uniprot/'
                                 // Should now appear at:
                                 // https://kg-hub.berkeleybop.io/frozen_incoming_data/uniprot
                             }
