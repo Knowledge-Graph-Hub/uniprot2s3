@@ -23,4 +23,6 @@ UNIPROT_REVIEWED_FLAG = "reviewed:true+"  # Not useful
 UNIPROT_REFERENCE_PROTEOMES_URL = "https://rest.uniprot.org/proteomes/"
 UNIPROT_REFERENCE_PROTEOMES_FIELDS = ["upid", "organism_id"]
 PROTEOMES_FILENAME = "Proteomes"
+PROTEOMES_PROTEOME_ID_COLUMNNAME = "Proteome Id"
+PROTEOMES_ORGANISM_ID_COLUMNNAME = "Organism Id"
 KGMICROBE_PROTEOMES_FILENAME = "Proteomes_KGMicrobe_Subset"
