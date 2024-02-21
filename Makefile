@@ -2,12 +2,11 @@ all: exclusion-branches uniprot-download
 
 exclusion-branches:
 
-	wget "https://raw.githubusercontent.com/Knowledge-Graph-Hub/kg-microbe/master/data/raw/exclusion_branches.tsv" -O data/raw/exclusion_branches.tsv
+	wget "https://kg-hub.berkeleybop.io/kg-microbe/current/raw/exclusion_branches.tsv" -O data/raw/exclusion_branches.tsv
 
 ncbi_removed_subset:
 
-	#Will download from s3 bucket which will be put there by jenkins while running kg-microbe pipeline. Need to ask Harry for assistance.
-
+	wget "https://kg-hub.berkeleybop.io/kg-microbe/current/raw/ncbitaxon_removed_subset.json" -O data/raw/ncbitaxon_removed_subset.json
 
 uniprot-download:
 
