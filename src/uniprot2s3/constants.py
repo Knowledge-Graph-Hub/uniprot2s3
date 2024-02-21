@@ -13,7 +13,7 @@ EXCLUSION_TERMS_FILE = "exclusion_branches.tsv"
 
 # Uniprot
 UNIPROT_BASE_URL = "https://rest.uniprot.org/uniprotkb/"
-UNIPROT_FIELDS = ["organism_id", "id", "accession", "protein_name", "ec", "ft_binding"]
+UNIPROT_FIELDS = ["organism_id", "id", "accession", "protein_name", "ec", "ft_binding", "go"]
 UNIPROT_KEYWORDS = ["Reference+proteome"]  # Not useful
 UNIPROT_DESIRED_FORMAT = "tsv"
 UNIPROT_SIZE = 500
