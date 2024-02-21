@@ -64,7 +64,7 @@ pipeline {
         stage('Run downloader') {
             steps {
                 dir('./working') {
-                    sh '. venv/bin/activate && rm data/raw/uniprot_empty_organism.tsv'
+                    sh '. venv/bin/activate && rm -f data/raw/uniprot_empty_organism.tsv || true'
 		            sh '. venv/bin/activate && make all'
                 }
             }
