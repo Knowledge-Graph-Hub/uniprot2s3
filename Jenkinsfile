@@ -68,7 +68,7 @@ pipeline {
 
         stage('Run downloader') {
             steps {
-                dir('./working') {
+                dir('./gitrepo') {
                     sh '. venv/bin/activate && rm -f data/raw/uniprot_empty_organism.tsv || true'
 		            sh '. venv/bin/activate && make all'
                 }
@@ -79,7 +79,7 @@ pipeline {
         stage('Upload result') {
             // Store similarity results at s3://kg-hub-public-data/frozen_incoming_data/uniprot
             steps {
-                dir('./working') {
+                dir('./gitrepo') {
                     script {
                             withCredentials([
 					            file(credentialsId: 's3cmd_kg_hub_push_configuration', variable: 'S3CMD_CFG'),
