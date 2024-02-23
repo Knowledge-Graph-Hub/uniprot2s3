@@ -58,6 +58,7 @@ pipeline {
                             url: 'https://github.com/Knowledge-Graph-Hub/uniprot2s3',
                             branch: env.BRANCH_NAME
                     )
+            sh '/usr/bin/python3.9 -m venv venv'
 			sh '. venv/bin/activate'
             sh './venv/bin/pip install .'
 			sh './venv/bin/pip install oaklib s3cmd'
