@@ -56,7 +56,7 @@ def _write_file(file_path, response, organism_id, mode="w"):
             tsv_file.write(f"{organism_id}\n")
 
 
-def get_organism_list(input_dir:Union[Path, str] = RAW_DATA_DIR) -> List[str]:
+def get_organism_list(input_dir: Union[Path, str] = RAW_DATA_DIR) -> List[str]:
     """
     Update organism list based on existing empty request files.
 
@@ -86,7 +86,7 @@ def get_organism_list(input_dir:Union[Path, str] = RAW_DATA_DIR) -> List[str]:
     return organism_list
 
 
-def run_api(show_status: bool, input_dir = RAW_DATA_DIR) -> None:
+def run_api(show_status: bool, input_dir=RAW_DATA_DIR) -> None:
     """
     Upload data to S3.
 
