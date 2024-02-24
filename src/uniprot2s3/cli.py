@@ -39,14 +39,15 @@ def main(verbose: int, quiet: bool):
 
 @main.command()
 @show_status_option
-def run(show_status):
+@click.option("-i", "--input-dir", type=click.Path(exists=True), help="Path to dir containing input resources.")
+def run(show_status, input_dir):
     """
     Get data via rest API.
 
     :param show_status: Flag to show download status or not.
     :return: None
     """
-    run_api(show_status)
+    run_api(show_status, input_dir)
 
 
 if __name__ == "__main__":

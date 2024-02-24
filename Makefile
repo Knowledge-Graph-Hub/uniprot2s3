@@ -10,4 +10,4 @@ ncbi_removed_subset:
 
 uniprot-download:
 
-	uniprot2s3 run
+	uniprot2s3 run --no-show-status --input-dir data/raw/
