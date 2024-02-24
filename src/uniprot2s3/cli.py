@@ -39,7 +39,7 @@ def main(verbose: int, quiet: bool):
 
 @main.command()
 @show_status_option
-@click.option("-i", "--input-dir", type=click.Path(exists=True), help="Input file to read.")
+@click.option("-i", "--input-dir", type=click.Path(exists=True), help="Path to dir containing input resources.")
 def run(show_status, input_dir):
     """
     Get data via rest API.
