@@ -5,7 +5,7 @@ import json
 import multiprocessing
 from functools import partial
 from pathlib import Path
-from typing import List
+from typing import List, Union
 from urllib import parse
 
 import pandas as pd
@@ -33,7 +33,7 @@ from .constants import (
 )
 from .dummy_tqdm import DummyTqdm
 
-ORGANISM_RESOURCE = RAW_DATA_DIR / "ncbitaxon_removed_subset.json"
+ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
 EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 UNIPROT_S3_DIR = RAW_DATA_DIR / "s3"
 
@@ -56,14 +56,14 @@ def _write_file(file_path, response, organism_id, mode="w"):
             tsv_file.write(f"{organism_id}\n")
 
 
-def get_organism_list() -> List[str]:
+def get_organism_list(input_dir:Union[Path, str] = RAW_DATA_DIR) -> List[str]:
     """
     Update organism list based on existing empty request files.
 
     :param organism_list: List of organism IDs.
     """
     # Read organism resource file and extract organism IDs
-    with open(ORGANISM_RESOURCE, "r") as f:
+    with open(Path(input_dir) / ORGANISM_RESOURCE, "r") as f:
         contents = json.load(f)
         ncbi_prefix = NCBITAXON_PREFIX.replace(":", "_")
 
@@ -86,7 +86,7 @@ def get_organism_list() -> List[str]:
     return organism_list
 
 
-def run_api(show_status: bool) -> None:
+def run_api(show_status: bool, input_dir = RAW_DATA_DIR) -> None:
     """
     Upload data to S3.
 
