@@ -63,7 +63,7 @@ pipeline {
             sh '/usr/bin/python3.9 -m venv venv'
 			sh '. venv/bin/activate'
             // sh './venv/bin/pip install .'
-            sh 'cd ./gitrepo' // this is a hack to get the makefile to work
+            sh 'pwd'
 			sh './venv/bin/pip install s3cmd'
                 }
             }
