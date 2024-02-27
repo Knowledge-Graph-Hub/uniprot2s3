@@ -41,6 +41,8 @@ pipeline {
                     sh "python3.9 --version"
                     sh "id"
                     sh "whoami" // this should be jenkinsuser
+                    sh "pwd"
+                    sh "ls -l"
                     // if the above fails, then the docker host didn't start the docker
                     // container as a user that this image knows about. This will
                     // likely cause lots of problems (like trying to write to $HOME
@@ -60,8 +62,9 @@ pipeline {
                     )
             sh '/usr/bin/python3.9 -m venv venv'
 			sh '. venv/bin/activate'
-            sh './venv/bin/pip install .'
-			sh './venv/bin/pip install oaklib s3cmd'
+            // sh './venv/bin/pip install .'
+            sh 'cd ./gitrepo' // this is a hack to get the makefile to work
+			sh './venv/bin/pip install s3cmd'
                 }
             }
         }
