@@ -95,7 +95,9 @@ def run_api(show_status: bool, input_dir=RAW_DATA_DIR) -> None:
     """
     proteome_organism_list = run_proteome_api(show_status)
     # run_uniprot_api(proteome_organism_list, show_status) # ! Single worker.
-    run_uniprot_api_parallel(proteome_organism_list, show_status)  # ! Multiple workers.
+    run_uniprot_api_parallel(
+        taxa_id_from_proteomes_list=proteome_organism_list, show_status=show_status, input_dir=input_dir
+    )  # ! Multiple workers.
 
 
 def run_proteome_api(show_status: bool) -> list:
@@ -255,7 +257,9 @@ def run_uniprot_api(taxa_id_from_proteomes_set, show_status: bool) -> None:
         progress.set_description(f"Downloading organism data from Uniprot, final file of batch: {organism_id}")
 
 
-def run_uniprot_api_parallel(taxa_id_from_proteomes_list, show_status: bool, workers: int = 1) -> None:
+def run_uniprot_api_parallel(
+    taxa_id_from_proteomes_list, show_status: bool, input_dir: Union[Path, str] = RAW_DATA_DIR, workers: int = 1
+) -> None:
     """
     Download data from Uniprot in parallel.
 
@@ -266,7 +270,7 @@ def run_uniprot_api_parallel(taxa_id_from_proteomes_list, show_status: bool, wor
     # Cache HTTP requests to avoid repeated calls
     requests_cache.install_cache("uniprot_cache")
 
-    organism_list = get_organism_list()
+    organism_list = get_organism_list(input_dir=input_dir)
 
     # Sort list
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
