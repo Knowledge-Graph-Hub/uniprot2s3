@@ -35,7 +35,6 @@ from .dummy_tqdm import DummyTqdm
 
 ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
 EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
-UNIPROT_S3_DIR = None
 
 
 # Function to read organisms from a CSV file and return a set
@@ -93,8 +92,9 @@ def run_api(show_status: bool, input_dir=RAW_DATA_DIR) -> None:
     :param api: A string pointing to the API to upload data to.
     :return: None
     """
+    global UNIPROT_S3_DIR
     proteome_organism_list = run_proteome_api(show_status)
-    UNIPROT_S3_DIR = Path(input_dir) / "s3"
+    UNIPROT_S3_DIR = Path(input_dir).joinpath("s3")
     UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
     # run_uniprot_api(proteome_organism_list, show_status) # ! Single worker.
     run_uniprot_api_parallel(
@@ -150,7 +150,7 @@ def fetch_uniprot_data(organism_id):
 
     :param organism_id: Just if the ID of the NCBITaxon entity.
     """
-    file_path = Path(UNIPROT_S3_DIR) / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
+    file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
     organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
     url = construct_query_url(
