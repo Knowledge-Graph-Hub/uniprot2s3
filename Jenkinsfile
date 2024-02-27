@@ -71,7 +71,7 @@ pipeline {
                 dir('./gitrepo') {
                     sh '. venv/bin/activate && rm -f data/raw/uniprot_empty_organism.tsv || true'
                     sh '. venv/bin/activate && pwd'
-                    sh '. venv/bin/activate && ls -l'
+                    sh '. venv/bin/activate && ls -l data/raw'
 		            sh '. venv/bin/activate && make all'
                 }
             }
