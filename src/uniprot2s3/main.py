@@ -94,7 +94,7 @@ def run_api(show_status: bool, input_dir=RAW_DATA_DIR) -> None:
     :return: None
     """
     proteome_organism_list = run_proteome_api(show_status)
-    UNIPROT_S3_DIR = input_dir / "s3"
+    UNIPROT_S3_DIR = Path(input_dir) / "s3"
     UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
     # run_uniprot_api(proteome_organism_list, show_status) # ! Single worker.
     run_uniprot_api_parallel(
