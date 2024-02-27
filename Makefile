@@ -9,4 +9,5 @@ ncbi_removed_subset:
 	wget "https://kg-hub.berkeleybop.io/kg-microbe/current/raw/ncbitaxon_removed_subset.json" -O data/raw/ncbitaxon_removed_subset.json
 
 uniprot-download:
-	uniprot2s3 run --no-show-status --input-dir "$(pwd)/data/raw/"
+	PWD=$(pwd)
+	uniprot2s3 run --no-show-status --input-dir $(PWD)/data/raw
