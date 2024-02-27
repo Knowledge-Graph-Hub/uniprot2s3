@@ -41,8 +41,6 @@ pipeline {
                     sh "python3.9 --version"
                     sh "id"
                     sh "whoami" // this should be jenkinsuser
-                    sh "pwd"
-                    sh "ls -l"
                     // if the above fails, then the docker host didn't start the docker
                     // container as a user that this image knows about. This will
                     // likely cause lots of problems (like trying to write to $HOME
@@ -62,8 +60,7 @@ pipeline {
                     )
             sh '/usr/bin/python3.9 -m venv venv'
 			sh '. venv/bin/activate'
-            // sh './venv/bin/pip install .'
-            sh 'pwd'
+            sh './venv/bin/pip install .'
 			sh './venv/bin/pip install s3cmd'
                 }
             }
@@ -73,6 +70,8 @@ pipeline {
             steps {
                 dir('./gitrepo') {
                     sh '. venv/bin/activate && rm -f data/raw/uniprot_empty_organism.tsv || true'
+                    sh '. venv/bin/activate && pwd'
+                    sh '. venv/bin/activate && ls -l'
 		            sh '. venv/bin/activate && make all'
                 }
             }
