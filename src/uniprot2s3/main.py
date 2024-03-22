@@ -3,8 +3,8 @@
 import csv
 import json
 import multiprocessing
-from functools import partial
 import os
+from functools import partial
 from pathlib import Path
 from typing import List, Union
 from urllib import parse
@@ -261,13 +261,18 @@ def run_uniprot_api(taxa_id_from_proteomes_set, show_status: bool) -> None:
 
 
 def run_uniprot_api_parallel(
-    taxa_id_from_proteomes_list, show_status: bool, input_dir: Union[Path, str] = RAW_DATA_DIR, workers: int = os.cpu_count()
+    taxa_id_from_proteomes_list,
+    show_status: bool,
+    input_dir: Union[Path, str] = RAW_DATA_DIR,
+    workers: int = os.cpu_count(),
 ) -> None:
     """
     Download data from Uniprot in parallel.
 
     :param taxa_id_from_proteomes_list: Set of organism ids with proteomes from Uniprot.
     :param show_status: Boolean flag to show progress status.
+    :param input_dir: Directory where the data is stored.
+    :param workers: Number of workers to use.
     :return: None
     """
     # Cache HTTP requests to avoid repeated calls
