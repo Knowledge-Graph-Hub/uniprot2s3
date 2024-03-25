@@ -10,4 +10,4 @@ ncbi_removed_subset:
 
 uniprot-download:
 	PWD=$(pwd)
-	uniprot2s3 run --no-show-status --input-dir $(PWD)/data/raw
+	uniprot2s3 run --show-status --input-dir $(PWD)/data/raw
