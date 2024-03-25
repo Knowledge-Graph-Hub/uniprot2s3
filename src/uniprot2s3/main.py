@@ -11,7 +11,6 @@ from urllib import parse
 
 import pandas as pd
 import requests
-import requests_cache
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 
