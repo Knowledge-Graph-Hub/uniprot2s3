@@ -110,8 +110,9 @@ def run_proteome_api(show_status: bool) -> list:
     :param show_status: Boolean flag to show progress status.
     :return: None
     """
+    # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    requests_cache.install_cache("uniprot_cache")
+    # requests_cache.install_cache("uniprot_cache")
 
     # Ensure the directory for storing Uniprot files exists
     Path(RAW_DATA_DIR).mkdir(parents=True, exist_ok=True)
@@ -236,8 +237,9 @@ def run_uniprot_api(taxa_id_from_proteomes_set, show_status: bool) -> None:
     :param show_status: Boolean flag to show progress status.
     :return: None
     """
+    # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    requests_cache.install_cache("uniprot_cache")
+    # requests_cache.install_cache("uniprot_cache")
 
     organism_list = get_organism_list()
 
@@ -275,8 +277,9 @@ def run_uniprot_api_parallel(
     :param workers: Number of workers to use.
     :return: None
     """
+    # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    requests_cache.install_cache("uniprot_cache")
+    # requests_cache.install_cache("uniprot_cache")
 
     organism_list = get_organism_list(input_dir=input_dir)
 
