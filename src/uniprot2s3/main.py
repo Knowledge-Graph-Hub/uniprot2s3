@@ -93,7 +93,8 @@ def run_api(show_status: bool, input_dir=RAW_DATA_DIR) -> None:
     :return: None
     """
     global UNIPROT_S3_DIR
-    proteome_organism_list = run_proteome_api(show_status)
+    #proteome_organism_list = run_proteome_api(show_status)
+    proteome_organism_list = ["UP000005640"]
     UNIPROT_S3_DIR = Path(input_dir).joinpath("s3")
     UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
     # run_uniprot_api(proteome_organism_list, show_status) # ! Single worker.
@@ -141,6 +142,8 @@ def construct_query_url(base_url, desired_format, query_terms, fields, query_siz
         f"{base_url}/search?query={query_terms}&format={desired_format}"
         f"&size={query_size}{keywords_param}{fields_param}"
     )
+    # print("url: ")
+    # print(url)
 
     return url
 
@@ -151,7 +154,13 @@ def fetch_uniprot_data(organism_id):
 
     :param organism_id: Just if the ID of the NCBITaxon entity.
     """
-    file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
+    # file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"f
+    file_path = (
+        "/Users/brooksantangelo/Documents/Repositories/uniprot2s3/data/raw/s3/"
+        + organism_id
+        + "."
+        + UNIPROT_DESIRED_FORMAT
+    )
     organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
     url = construct_query_url(
@@ -278,13 +287,12 @@ def run_uniprot_api_parallel(
     """
     # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    # requests_cache.install_cache("uniprot_cache")
-
     organism_list = get_organism_list(input_dir=input_dir)
 
     # Sort list
-    taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
-    taxa_id_common_with_proteomes_list.sort()
+    # taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
+    # taxa_id_common_with_proteomes_list.sort()
+    taxa_id_common_with_proteomes_list = ["9606"]
 
     # Write used IDs to file
     file_path = Path(RAW_DATA_DIR) / f"{KGMICROBE_PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
