@@ -26,6 +26,8 @@ UNIPROT_FIELDS = [
     "cc_pathway",
     "reviewed",
     "cc_function",
+    "cc_disease",
+    "gene_primary",
 ]
 UNIPROT_KEYWORDS = ["Reference+proteome"]  # Not useful
 UNIPROT_DESIRED_FORMAT = "tsv"
@@ -39,3 +41,5 @@ PROTEOMES_FILENAME = "Proteomes"
 PROTEOMES_PROTEOME_ID_COLUMNNAME = "Proteome Id"
 PROTEOMES_ORGANISM_ID_COLUMNNAME = "Organism Id"
 KGMICROBE_PROTEOMES_FILENAME = "Proteomes_KGMicrobe_Subset"
+
+#UNIPROT_S3_DIR = RAW_DATA_DIR / "/s3"
