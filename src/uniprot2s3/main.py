@@ -154,8 +154,13 @@ def fetch_uniprot_data(organism_id):
 
     :param organism_id: Just if the ID of the NCBITaxon entity.
     """
-    #file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"f
-    file_path = "/Users/brooksantangelo/Documents/Repositories/uniprot2s3/data/raw/s3/" + organism_id + "." + UNIPROT_DESIRED_FORMAT
+    # file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"f
+    file_path = (
+        "/Users/brooksantangelo/Documents/Repositories/uniprot2s3/data/raw/s3/"
+        + organism_id
+        + "."
+        + UNIPROT_DESIRED_FORMAT
+    )
     organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
     url = construct_query_url(
@@ -282,15 +287,11 @@ def run_uniprot_api_parallel(
     """
     # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    # requests_cache.install_cache("uniprot_cache")
-    # UNIPROT_S3_DIR = Path(input_dir).joinpath("s3")
-    # print('dir in run_uniprot_api_parallel')
-    # print(UNIPROT_S3_DIR)
     organism_list = get_organism_list(input_dir=input_dir)
 
     # Sort list
-    #taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
-    #taxa_id_common_with_proteomes_list.sort()
+    # taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
+    # taxa_id_common_with_proteomes_list.sort()
     taxa_id_common_with_proteomes_list = ["9606"]
 
     # Write used IDs to file
