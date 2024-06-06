@@ -299,6 +299,11 @@ def run_uniprot_api_parallel(
     # Cache HTTP requests to avoid repeated calls
     # requests_cache.install_cache("uniprot_cache")
     organism_list = get_organism_list(input_dir=input_dir)
+    # See which organisms have already been downloaded
+    existing_organism_ids = os.listdir(UNIPROT_S3_DIR)
+    existing_organism_ids = [file for file in existing_organism_ids if file.endswith('.tsv')]
+    existing_organism_ids = [file.replace('.tsv','') for file in existing_organism_ids]
+    organism_list = list(set(organism_list).difference(set(existing_organism_ids)))
 
     # Sort list
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
