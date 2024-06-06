@@ -33,7 +33,8 @@ from .constants import (
 )
 from .dummy_tqdm import DummyTqdm
 
-ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
+# ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
+BACDIVE_RESOURCE = "trait_taxa.tsv"
 EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 
 
@@ -62,16 +63,12 @@ def get_organism_list(input_dir: Union[Path, str] = RAW_DATA_DIR) -> List[str]:
     :param organism_list: List of organism IDs.
     """
     # Read organism resource file and extract organism IDs
-    with open(Path(input_dir) / ORGANISM_RESOURCE, "r") as f:
-        contents = json.load(f)
-        ncbi_prefix = NCBITAXON_PREFIX.replace(":", "_")
+    with open(Path(input_dir) / BACDIVE_RESOURCE, "r") as f:
+        organism_list = []
+        for line in f:
+            taxa_id = line.strip()
+            organism_list.append(taxa_id.split(NCBITAXON_PREFIX)[1])
 
-    # Create a list of organism IDs after filtering and cleaning
-    organism_list = [
-        i["id"].split(ncbi_prefix)[1]
-        for i in contents["graphs"][0]["nodes"]
-        if ncbi_prefix in i["id"] and i["id"].split(ncbi_prefix)[1].isdigit()
-    ]
     # Update organism list based on existing empty request files
     for file_path in [EMPTY_ORGANISM_OUTFILE]:
         if file_path.is_file():
