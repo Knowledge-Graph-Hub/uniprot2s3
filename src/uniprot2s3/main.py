@@ -33,7 +33,8 @@ from .constants import (
 )
 from .dummy_tqdm import DummyTqdm
 
-ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
+# ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
+BACDIVE_RESOURCE = "trait_taxa.tsv"
 EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 
 
@@ -62,16 +63,12 @@ def get_organism_list(input_dir: Union[Path, str] = RAW_DATA_DIR) -> List[str]:
     :param organism_list: List of organism IDs.
     """
     # Read organism resource file and extract organism IDs
-    with open(Path(input_dir) / ORGANISM_RESOURCE, "r") as f:
-        contents = json.load(f)
-        ncbi_prefix = NCBITAXON_PREFIX.replace(":", "_")
+    with open(Path(input_dir) / BACDIVE_RESOURCE, "r") as f:
+        organism_list = []
+        for line in f:
+            taxa_id = line.strip()
+            organism_list.append(taxa_id.split(NCBITAXON_PREFIX)[1])
 
-    # Create a list of organism IDs after filtering and cleaning
-    organism_list = [
-        i["id"].split(ncbi_prefix)[1]
-        for i in contents["graphs"][0]["nodes"]
-        if ncbi_prefix in i["id"] and i["id"].split(ncbi_prefix)[1].isdigit()
-    ]
     # Update organism list based on existing empty request files
     for file_path in [EMPTY_ORGANISM_OUTFILE]:
         if file_path.is_file():
@@ -151,6 +148,8 @@ def fetch_uniprot_data(organism_id):
 
     :param organism_id: Just if the ID of the NCBITaxon entity.
     """
+    global UNIPROT_S3_DIR
+    UNIPROT_S3_DIR = Path(RAW_DATA_DIR).joinpath("s3")
     file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
     organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
@@ -191,41 +190,53 @@ def fetch_uniprot_reference_proteome_data() -> list:
         UNIPROT_SIZE,
     )
 
-    try:
-        # Make the HTTP request to Uniprot
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
-        # Write response to file if it contains data
-        if len(response.text.strip().split("\n")) > 1:
-            with open(file_path, "w") as file:
-                file.write(response.text)
-
-        while "next" in response.links:
-            next_url = response.links["next"]["url"]
-            response = requests.get(next_url, timeout=30)
+    if not file_path.exists():
+        try:
+            # Make the HTTP request to Uniprot
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
             # Write response to file if it contains data
             if len(response.text.strip().split("\n")) > 1:
-                with open(file_path, "a") as file:
+                with open(file_path, "w") as file:
                     file.write(response.text)
 
-        # Read file to df for sorting
-        df = pd.read_csv(file_path, sep="\t", low_memory=False)
-        df = df.sort_values(
-            by=[PROTEOMES_ORGANISM_ID_COLUMNNAME, PROTEOMES_PROTEOME_ID_COLUMNNAME], axis=0, ascending=True
-        )
-        df.to_csv(file_path, sep="\t", index=False)
+            while "next" in response.links:
+                next_url = response.links["next"]["url"]
+                response = requests.get(next_url, timeout=30)
+                response.raise_for_status()
+                # Write response to file if it contains data
+                if len(response.text.strip().split("\n")) > 1:
+                    with open(file_path, "a") as file:
+                        file.write(response.text)
+            # Read file to df for sorting
+            df = pd.read_csv(file_path, sep="\t", low_memory=False)
+            df = df.sort_values(
+                by=[PROTEOMES_ORGANISM_ID_COLUMNNAME, PROTEOMES_PROTEOME_ID_COLUMNNAME], axis=0, ascending=True
+            )
+            df.to_csv(file_path, sep="\t", index=False)
 
-        organism_ids = df[PROTEOMES_ORGANISM_ID_COLUMNNAME].unique().tolist()
+            organism_ids = df[PROTEOMES_ORGANISM_ID_COLUMNNAME].unique().tolist()
 
-        return organism_ids
+            return organism_ids
+        
+        except requests.exceptions.HTTPError:
+            print(f"Bad request for {PROTEOMES_FILENAME} - {response.status_code}")
+        except requests.exceptions.Timeout:
+            print("The request timed out")
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
 
-    except requests.exceptions.HTTPError:
-        print(f"Bad request for {PROTEOMES_FILENAME} - {response.status_code}")
-    except requests.exceptions.Timeout:
-        print("The request timed out")
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+    else:
+            # Read file to df for sorting
+            df = pd.read_csv(file_path, sep="\t", low_memory=False)
+            df = df.sort_values(
+                by=[PROTEOMES_ORGANISM_ID_COLUMNNAME, PROTEOMES_PROTEOME_ID_COLUMNNAME], axis=0, ascending=True
+            )
+            df.to_csv(file_path, sep="\t", index=False)
+
+            organism_ids = df[PROTEOMES_ORGANISM_ID_COLUMNNAME].unique().tolist()
+
+            return organism_ids
 
 
 def run_uniprot_api(taxa_id_from_proteomes_set, show_status: bool) -> None:
@@ -281,6 +292,11 @@ def run_uniprot_api_parallel(
     # requests_cache.install_cache("uniprot_cache")
 
     organism_list = get_organism_list(input_dir=input_dir)
+    # See which organisms have already been downloaded
+    existing_organism_ids = os.listdir(UNIPROT_S3_DIR)
+    existing_organism_ids = [file for file in existing_organism_ids if file.endswith('.tsv')]
+    existing_organism_ids = [file.replace('.tsv','') for file in existing_organism_ids]
+    organism_list = list(set(organism_list).difference(set(existing_organism_ids)))
 
     # Sort list
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))

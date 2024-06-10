@@ -1,4 +1,4 @@
-all: exclusion-branches ncbi_removed_subset uniprot-download
+all: uniprot-download
 
 exclusion-branches:
 
