@@ -36,6 +36,14 @@ from .dummy_tqdm import DummyTqdm
 ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
 EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 
+# Define UNIPROT_S3_DIR globally
+if RAW_DATA_DIR.is_dir():
+    UNIPROT_S3_DIR = Path(RAW_DATA_DIR).joinpath("s3")
+else:
+    UNIPROT_S3_DIR = "s3"
+UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
+
+
 
 # Function to read organisms from a CSV file and return a set
 def _read_organisms_from_csv(file_path):
@@ -92,7 +100,6 @@ def run_api(show_status: bool, input_dir=RAW_DATA_DIR) -> None:
     :param api: A string pointing to the API to upload data to.
     :return: None
     """
-    global UNIPROT_S3_DIR
     proteome_organism_list = run_proteome_api(show_status)
     UNIPROT_S3_DIR = Path(input_dir).joinpath("s3")
     UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
@@ -181,12 +188,17 @@ def fetch_uniprot_data(organism_id):
 def fetch_uniprot_reference_proteome_data() -> list:
     """Single URL request for Uniprot proteome data."""
     file_path = Path(RAW_DATA_DIR) / f"{PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
-    all_proteomes_query = "%28*%29"
+    # all_proteomes_query = "%28*%29"
+    filtered_proteomes_query = (
+        "(*)+AND+((superkingdom:Bacteria)+OR+(superkingdom:Archaea))"
+        "+AND+((proteome_type:1)+OR+(proteome_type:2))"
+    )
+    
 
     url = construct_query_url(
         UNIPROT_REFERENCE_PROTEOMES_URL,
         UNIPROT_DESIRED_FORMAT,
-        all_proteomes_query,
+        filtered_proteomes_query,
         UNIPROT_REFERENCE_PROTEOMES_FIELDS,
         UNIPROT_SIZE,
     )
@@ -301,7 +313,7 @@ def run_uniprot_api_parallel(
         fetch_func = partial(fetch_uniprot_data)
         # If show_status is True, use process_map to display a progress bar
         if show_status:
-            process_map(fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers)
+            process_map(fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers, chunksize=999)
         else:
             # Set up a pool of worker processes without a progress bar
             with multiprocessing.Pool(processes=workers) as pool:
