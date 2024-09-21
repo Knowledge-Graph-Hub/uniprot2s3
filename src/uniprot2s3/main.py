@@ -15,6 +15,7 @@ from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 
 from .constants import (
+    CHUNK_SIZE_PER_WORKER,
     KGMICROBE_PROTEOMES_FILENAME,
     NCBITAXON_PREFIX,
     ORGANISM_ID_MIXED_CASE,
@@ -42,7 +43,6 @@ if RAW_DATA_DIR.is_dir():
 else:
     UNIPROT_S3_DIR = "s3"
 UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
-
 
 
 # Function to read organisms from a CSV file and return a set
@@ -190,10 +190,8 @@ def fetch_uniprot_reference_proteome_data() -> list:
     file_path = Path(RAW_DATA_DIR) / f"{PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
     # all_proteomes_query = "%28*%29"
     filtered_proteomes_query = (
-        "(*)+AND+((superkingdom:Bacteria)+OR+(superkingdom:Archaea))"
-        "+AND+((proteome_type:1)+OR+(proteome_type:2))"
+        "(*)+AND+((superkingdom:Bacteria)+OR+(superkingdom:Archaea))" "+AND+((proteome_type:1)+OR+(proteome_type:2))"
     )
-    
 
     url = construct_query_url(
         UNIPROT_REFERENCE_PROTEOMES_URL,
@@ -219,12 +217,15 @@ def fetch_uniprot_reference_proteome_data() -> list:
             # Write response to file if it contains data
             if len(response.text.strip().split("\n")) > 1:
                 with open(file_path, "a") as file:
-                    file.write(response.text)
+                    file.write(response.text) if PROTEOMES_ORGANISM_ID_COLUMNNAME not in response.text else None
 
         # Read file to df for sorting
         df = pd.read_csv(file_path, sep="\t", low_memory=False)
+        df = df.drop_duplicates()
         df = df.sort_values(
-            by=[PROTEOMES_ORGANISM_ID_COLUMNNAME, PROTEOMES_PROTEOME_ID_COLUMNNAME], axis=0, ascending=True
+            by=[PROTEOMES_ORGANISM_ID_COLUMNNAME, PROTEOMES_PROTEOME_ID_COLUMNNAME],
+            axis=0,
+            ascending=True,
         )
         df.to_csv(file_path, sep="\t", index=False)
 
@@ -313,7 +314,9 @@ def run_uniprot_api_parallel(
         fetch_func = partial(fetch_uniprot_data)
         # If show_status is True, use process_map to display a progress bar
         if show_status:
-            process_map(fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers, chunksize=999)
+            process_map(
+                fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers, chunksize=CHUNK_SIZE_PER_WORKER
+            )
         else:
             # Set up a pool of worker processes without a progress bar
             with multiprocessing.Pool(processes=workers) as pool:
