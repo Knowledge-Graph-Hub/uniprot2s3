@@ -40,9 +40,10 @@ EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 # Define UNIPROT_S3_DIR globally
 if RAW_DATA_DIR.is_dir():
     UNIPROT_S3_DIR = Path(RAW_DATA_DIR).joinpath("s3")
+    UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
 else:
-    UNIPROT_S3_DIR = Path("data/raw/s3")
-UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
+    UNIPROT_S3_DIR = None
+
 
 
 # Function to read organisms from a CSV file and return a set
