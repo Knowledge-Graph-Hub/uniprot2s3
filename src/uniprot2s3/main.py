@@ -186,7 +186,7 @@ def fetch_uniprot_reference_proteome_data() -> list:
     file_path = Path(RAW_DATA_DIR) / f"{PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
     # all_proteomes_query = "%28*%29"
     filtered_proteomes_query = (
-        "(*)+AND+((superkingdom:Bacteria)+OR+(superkingdom:Archaea))+AND+((proteome_type:1)+OR+(proteome_type:2))"
+        "((superkingdom:Bacteria)+OR+(superkingdom:Archaea))+AND+((proteome_type:1)+OR+(proteome_type:2))"
     )
 
     url = construct_query_url(
