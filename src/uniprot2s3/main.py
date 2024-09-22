@@ -41,7 +41,7 @@ EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 if RAW_DATA_DIR.is_dir():
     UNIPROT_S3_DIR = Path(RAW_DATA_DIR).joinpath("s3")
 else:
-    UNIPROT_S3_DIR = "s3"
+    UNIPROT_S3_DIR = Path("data/raw/s3")
 UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
 
 
