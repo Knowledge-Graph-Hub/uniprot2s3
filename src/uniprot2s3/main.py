@@ -311,7 +311,7 @@ def run_uniprot_api_parallel(
         # If show_status is True, use process_map to display a progress bar
         if show_status:
             process_map(
-                fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers, chunksize=CHUNK_SIZE_PER_WORKER
+                fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers
             )
         else:
             # Set up a pool of worker processes without a progress bar
