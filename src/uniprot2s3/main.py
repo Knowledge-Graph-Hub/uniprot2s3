@@ -243,6 +243,7 @@ def fetch_uniprot_reference_proteome_data() -> list:
             axis=0,
             ascending=True,
         )
+        df = df[~df.apply(lambda row: any(row[col] == col for col in df.columns), axis=1)]
         df.to_csv(file_path, sep="\t", index=False)
 
         organism_ids = df[PROTEOMES_ORGANISM_ID_COLUMNNAME].unique().tolist()
