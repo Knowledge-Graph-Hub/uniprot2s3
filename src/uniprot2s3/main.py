@@ -159,43 +159,47 @@ def fetch_uniprot_data(organism_id):
     max_retries = 3
     backoff_factor = 1
     file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
-    organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
-    url = construct_query_url(
-        UNIPROT_BASE_URL, UNIPROT_DESIRED_FORMAT, organism_query, UNIPROT_FIELDS, UNIPROT_SIZE, UNIPROT_KEYWORDS
-    )
+    if not file_path.is_file():
+        organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
-    try:
-        # Make the HTTP request to Uniprot
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
-        _write_file(file_path, response, organism_id, "w")
+        url = construct_query_url(
+            UNIPROT_BASE_URL, UNIPROT_DESIRED_FORMAT, organism_query, UNIPROT_FIELDS, UNIPROT_SIZE, UNIPROT_KEYWORDS
+        )
 
-        while "next" in response.links:
-            next_url = response.links["next"]["url"]
-            retries = 0
-            while retries < max_retries:
-                try:
-                    response = requests.get(next_url, timeout=30)
-                    response.raise_for_status()
-                    _write_file(file_path, response, organism_id, "a")
-                    break
-                except requests.exceptions.RequestException as e:
-                    retries += 1
-                    if retries >= max_retries:
-                        print(f"Failed to fetch {next_url} after {max_retries} attempts.")
-                        raise e
-                    else:
-                        wait_time = backoff_factor * (2 ** (retries - 1))
-                        print(f"Retrying {next_url} in {wait_time} seconds...")
-                        time.sleep(wait_time)
+        try:
+            # Make the HTTP request to Uniprot
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            _write_file(file_path, response, organism_id, "w")
 
-    except requests.exceptions.HTTPError:
-        print(f"Bad request for organism {organism_id} - {response.status_code}")
-    except requests.exceptions.Timeout:
-        print("The request timed out")
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+            while "next" in response.links:
+                next_url = response.links["next"]["url"]
+                retries = 0
+                while retries < max_retries:
+                    try:
+                        response = requests.get(next_url, timeout=30)
+                        response.raise_for_status()
+                        _write_file(file_path, response, organism_id, "a")
+                        break
+                    except requests.exceptions.RequestException as e:
+                        retries += 1
+                        if retries >= max_retries:
+                            print(f"Failed to fetch {next_url} after {max_retries} attempts.")
+                            raise e
+                        else:
+                            wait_time = backoff_factor * (2 ** (retries - 1))
+                            print(f"Retrying {next_url} in {wait_time} seconds...")
+                            time.sleep(wait_time)
+
+        except requests.exceptions.HTTPError:
+            print(f"Bad request for organism {organism_id} - {response.status_code}")
+        except requests.exceptions.Timeout:
+            print("The request timed out")
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred: {e}")
+    else:
+        print(f"File {file_path} was already downloaded.")
 
 
 def fetch_uniprot_reference_proteome_data() -> list:
