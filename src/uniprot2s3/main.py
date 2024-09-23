@@ -188,7 +188,6 @@ def fetch_uniprot_reference_proteome_data() -> list:
     filtered_proteomes_query = (
         "((superkingdom:Bacteria)+OR+(superkingdom:Archaea))+AND+((proteome_type:1)+OR+(proteome_type:2))"
     )
-    import pdb; pdb.set_trace()
 
     url = construct_query_url(
         UNIPROT_REFERENCE_PROTEOMES_URL,
