@@ -184,15 +184,16 @@ def fetch_uniprot_data(organism_id):
 def fetch_uniprot_reference_proteome_data() -> list:
     """Single URL request for Uniprot proteome data."""
     file_path = Path(RAW_DATA_DIR) / f"{PROTEOMES_FILENAME}.{UNIPROT_DESIRED_FORMAT}"
-    all_proteomes_query = "%28*%29"
-    # filtered_proteomes_query = (
-    #     "((superkingdom:Bacteria)+OR+(superkingdom:Archaea))+AND+((proteome_type:1)+OR+(proteome_type:2))"
-    # )
+    # all_proteomes_query = "%28*%29"
+    filtered_proteomes_query = (
+        "((superkingdom:Bacteria)+OR+(superkingdom:Archaea))+AND+((proteome_type:1)+OR+(proteome_type:2))"
+    )
+    import pdb; pdb.set_trace()
 
     url = construct_query_url(
         UNIPROT_REFERENCE_PROTEOMES_URL,
         UNIPROT_DESIRED_FORMAT,
-        all_proteomes_query,
+        filtered_proteomes_query,
         UNIPROT_REFERENCE_PROTEOMES_FIELDS,
         UNIPROT_SIZE,
     )
@@ -311,7 +312,7 @@ def run_uniprot_api_parallel(
         # If show_status is True, use process_map to display a progress bar
         if show_status:
             process_map(
-                fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers
+                fetch_func, taxa_id_common_with_proteomes_list, max_workers=workers, chunksize=CHUNK_SIZE_PER_WORKER
             )
         else:
             # Set up a pool of worker processes without a progress bar
