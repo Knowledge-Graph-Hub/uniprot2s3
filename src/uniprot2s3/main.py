@@ -115,7 +115,9 @@ def run_proteome_api(show_status: bool) -> list:
     """
     # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    # requests_cache.install_cache("uniprot_cache")
+    import requests_cache
+
+    requests_cache.install_cache("uniprot_cache")
 
     # Ensure the directory for storing Uniprot files exists
     Path(RAW_DATA_DIR).mkdir(parents=True, exist_ok=True)
@@ -251,9 +253,9 @@ def run_uniprot_api(taxa_id_from_proteomes_set, show_status: bool) -> None:
     # requests_cache.install_cache("uniprot_cache")
 
     organism_list = get_organism_list()
+    taxa_id_from_proteomes_set = [str(x) for x in taxa_id_from_proteomes_set]
 
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_set))
-
     # Process uniprot files
     total_organisms = len(taxa_id_common_with_proteomes_list)
     progress_class = tqdm if show_status else DummyTqdm
@@ -291,6 +293,7 @@ def run_uniprot_api_parallel(
     # requests_cache.install_cache("uniprot_cache")
 
     organism_list = get_organism_list(input_dir=input_dir)
+    taxa_id_from_proteomes_list = [str(x) for x in taxa_id_from_proteomes_list]
 
     # Sort list
     taxa_id_common_with_proteomes_list = list(set(organism_list).intersection(taxa_id_from_proteomes_list))
