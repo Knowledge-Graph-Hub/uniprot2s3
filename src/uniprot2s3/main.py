@@ -4,6 +4,7 @@ import csv
 import json
 import multiprocessing
 import os
+import time
 from functools import partial
 from pathlib import Path
 from typing import List, Union
@@ -157,6 +158,8 @@ def fetch_uniprot_data(organism_id):
 
     :param organism_id: Just if the ID of the NCBITaxon entity.
     """
+    max_retries = 3
+    backoff_factor = 1
     file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
     organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
 
@@ -172,9 +175,22 @@ def fetch_uniprot_data(organism_id):
 
         while "next" in response.links:
             next_url = response.links["next"]["url"]
-            response = requests.get(next_url, timeout=30)
-            response.raise_for_status()
-            _write_file(file_path, response, organism_id, "a")
+            retries = 0
+            while retries < max_retries:
+                try:
+                    response = requests.get(next_url, timeout=30)
+                    response.raise_for_status()
+                    _write_file(file_path, response, organism_id, "a")
+                    break
+                except requests.exceptions.RequestException as e:
+                    retries += 1
+                    if retries >= max_retries:
+                        print(f"Failed to fetch {next_url} after {max_retries} attempts.")
+                        raise e
+                    else:
+                        wait_time = backoff_factor * (2 ** (retries - 1))
+                        print(f"Retrying {next_url} in {wait_time} seconds...")
+                        time.sleep(wait_time)
 
     except requests.exceptions.HTTPError:
         print(f"Bad request for organism {organism_id} - {response.status_code}")
