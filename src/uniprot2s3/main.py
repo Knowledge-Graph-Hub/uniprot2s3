@@ -216,7 +216,8 @@ def fetch_uniprot_reference_proteome_data() -> list:
             # Write response to file if it contains data
             if len(response.text.strip().split("\n")) > 1:
                 with open(file_path, "a") as file:
-                    file.write(response.text) if PROTEOMES_ORGANISM_ID_COLUMNNAME not in response.text else None
+                    # file.write(response.text) if PROTEOMES_ORGANISM_ID_COLUMNNAME not in response.text else None
+                    file.write(response.text)
 
         # Read file to df for sorting
         df = pd.read_csv(file_path, sep="\t", low_memory=False)
