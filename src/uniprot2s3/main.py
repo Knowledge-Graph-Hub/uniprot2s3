@@ -41,6 +41,7 @@ EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 UNIPROT_S3_DIR = Path(RAW_DATA_DIR).joinpath("s3")
 UNIPROT_S3_DIR.mkdir(parents=True, exist_ok=True)
 
+
 # Function to read organisms from a CSV file and return a set
 def _read_organisms_from_csv(file_path):
     with open(file_path, newline="") as csvfile:
