@@ -116,9 +116,7 @@ def run_proteome_api(show_status: bool) -> list:
     """
     # ! Cannot be used during multiprocessing
     # Cache HTTP requests to avoid repeated calls
-    import requests_cache
-
-    requests_cache.install_cache("uniprot_cache")
+    # requests_cache.install_cache("uniprot_cache")
 
     # Ensure the directory for storing Uniprot files exists
     Path(RAW_DATA_DIR).mkdir(parents=True, exist_ok=True)
