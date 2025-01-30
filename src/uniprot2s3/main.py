@@ -35,7 +35,8 @@ from .constants import (
 )
 from .dummy_tqdm import DummyTqdm
 
-ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
+# ORGANISM_RESOURCE = "ncbitaxon_removed_subset.json"
+ORGANISM_RESOURCE = "wallen_etal_microbes.txt"
 EMPTY_ORGANISM_OUTFILE = RAW_DATA_DIR / "uniprot_empty_organism.tsv"
 
 # Define UNIPROT_S3_DIR globally
@@ -69,15 +70,21 @@ def get_organism_list(input_dir: Union[Path, str] = RAW_DATA_DIR) -> List[str]:
     """
     # Read organism resource file and extract organism IDs
     with open(Path(input_dir) / ORGANISM_RESOURCE, "r") as f:
-        contents = json.load(f)
-        ncbi_prefix = NCBITAXON_PREFIX.replace(":", "_")
+        try:
+            contents = json.load(f)
+            ncbi_prefix = NCBITAXON_PREFIX.replace(":", "_")
 
-    # Create a list of organism IDs after filtering and cleaning
-    organism_list = [
-        i["id"].split(ncbi_prefix)[1]
-        for i in contents["graphs"][0]["nodes"]
-        if ncbi_prefix in i["id"] and i["id"].split(ncbi_prefix)[1].isdigit()
-    ]
+            # Create a list of organism IDs after filtering and cleaning
+            organism_list = [
+                i["id"].split(ncbi_prefix)[1]
+                for i in contents["graphs"][0]["nodes"]
+                if ncbi_prefix in i["id"] and i["id"].split(ncbi_prefix)[1].isdigit()
+            ]
+        except json.JSONDecodeError:
+            with open(Path(input_dir) / ORGANISM_RESOURCE, "r", encoding='utf-8') as f:
+                organism_list = f.readlines()
+    organism_list = [line.strip().split(NCBITAXON_PREFIX)[1] for line in organism_list]
+
     # Update organism list based on existing empty request files
     for file_path in [EMPTY_ORGANISM_OUTFILE]:
         if file_path.is_file():
@@ -88,6 +95,7 @@ def get_organism_list(input_dir: Union[Path, str] = RAW_DATA_DIR) -> List[str]:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(file_path, "w") as tsv_file:
                 tsv_file.write(f"{ORGANISM_ID_MIXED_CASE}\n")
+    print(len(organism_list))
     return organism_list
 
 
@@ -159,6 +167,7 @@ def fetch_uniprot_data(organism_id):
     max_retries = 3
     backoff_factor = 1
     file_path = UNIPROT_S3_DIR / f"{organism_id}.{UNIPROT_DESIRED_FORMAT}"
+    print(file_path)
 
     if not file_path.is_file():
         organism_query = TAXONOMY_ID_UNIPROT_PREFIX + organism_id
