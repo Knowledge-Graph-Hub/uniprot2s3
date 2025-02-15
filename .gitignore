@@ -133,3 +133,6 @@ uniprot_cache.sqlite
 data/raw/s3/*
 !data/raw/s3/Proteomes_KGMicrobe_Subset.tsv
 *.DS_Store
+
+# Outputs
+/data/raw/*s3
